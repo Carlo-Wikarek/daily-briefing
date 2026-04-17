@@ -1,9 +1,9 @@
 name: Daily Update
 
 on:
-  # Taeglich um 07:00 Uhr UTC
+  # Taeglich um 07:00 Uhr unsere Zeit
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "45 4 * * *"
   # Manuell ausloesbar
   workflow_dispatch:
 
