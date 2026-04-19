@@ -21,6 +21,7 @@ seen.json Struktur (pro Eintrag):
 
 import json
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 from html import escape
@@ -230,6 +231,14 @@ def _filter_title(titel):
     return titel.strip().lower() not in BLOCKED_TITLES
 
 
+def _clean_text(text):
+    """Bereinigt Text: fuehrende/folgende Leerzeichen entfernen, mehrfache Leerzeichen zusammenfassen."""
+    if not text:
+        return ""
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+
 def _fetch_page(url, name, use_raw_bytes=False):
     """Laedt eine Seite mit Logging und gibt (resp, soup) oder (None, None) zurueck.
     use_raw_bytes: True fuer Seiten mit problematischer Zeichenkodierung (z.B. Amprion).
@@ -264,7 +273,7 @@ def scrape_amprion(url):
         return artikel
 
     for h3 in soup.select("h3.mol--press-release__headline"):
-        titel = h3.get_text(strip=True)
+        titel = _clean_text(h3.get_text())
         if not _filter_title(titel):
             if not titel:
                 print(f"  WARNUNG: Leerer h3-Titel bei Amprion")
@@ -291,13 +300,11 @@ def scrape_amprion(url):
     return artikel
 
 
-GENERIC_TITLES = {"festlegung", "hinweise", "hinweises", "entscheidung", "einleitung", "erhebungsbogen", "mitteilung", "veröffentlichung", "feststellung", "anlage 1"}
-
 def scrape_bk8(url):
     """Extrahiert Eintraege von Bundesnetzagentur BK8 Aktuell-Seite.
     Struktur: Tabelle mit Datum und Titel-Spalte.
-    Wenn der Link-Text generisch ist (z.B. 'Festlegung'), wird der
-    vollstaendige Zellentext als Titel verwendet.
+    Der Teasertext (vollstaendiger Zellentext) wird immer an den Titel angehaengt.
+    Format: "[Titel] – [Teasertext]"
     """
     artikel = []
     name = "BK8"
@@ -317,7 +324,7 @@ def scrape_bk8(url):
             a = last_cell.find("a", href=True)
             if not a:
                 continue
-            titel = a.get_text(strip=True)
+            titel = _clean_text(a.get_text())
             href = str(a.get("href", ""))
             if not href:
                 continue
@@ -325,10 +332,12 @@ def scrape_bk8(url):
                 if not titel and a:
                     print(f"  WARNUNG: Leerer Titel fuer Link {href[:60]}")
                 continue
-            if titel.lower() in GENERIC_TITLES or len(titel) < 15:
-                cell_text = last_cell.get_text(strip=True)
-                if cell_text and len(cell_text) > len(titel):
-                    titel = cell_text[:160].rstrip()
+            cell_text = _clean_text(last_cell.get_text())
+            if cell_text and len(cell_text) > len(titel):
+                teaser = cell_text[len(titel):].strip()
+                if teaser:
+                    titel = f"{titel} – {teaser[:160].rstrip()}"
+            titel = _clean_text(titel)
             full_url = urljoin(base_url, href)
             artikel.append({"title": titel, "link": full_url})
 
@@ -348,7 +357,7 @@ def scrape_bmwe(url):
         return artikel
 
     for card_title in soup.select(".card-title"):
-        titel = card_title.get_text(strip=True)
+        titel = _clean_text(card_title.get_text())
         # Link im Parent suchen
         a = None
         el = card_title
