@@ -2746,5 +2746,35 @@
     "title": "Rhein-Main-Link: Online-Bürgersprechstunden zu Planfeststellungsunterlagen",
     "source": "Amprion – Pressemitteilungen",
     "category": "Netzbetrieb"
+  },
+  "https://www.tagesschau.de/wirtschaft/finanzen/marktberichte/marktbericht-dax-dow-120.html": {
+    "date": "2026-04-22",
+    "title": "Marktbericht: Nahostkrise weiter im Fokus",
+    "source": "Tagesschau",
+    "category": "Nachrichten"
+  },
+  "https://www.tagesschau.de/wirtschaft/konjunktur/fruehjahrsprognose-bundesregierung-102.html": {
+    "date": "2026-04-22",
+    "title": "Stimmung in der Wirtschaft: Frust, Desillusion und schwindende Hoffnung auf Reformen",
+    "source": "Tagesschau",
+    "category": "Nachrichten"
+  },
+  "https://www.tagesschau.de/inland/innenpolitik/militaerstrategie-bundeswehr-100.html": {
+    "date": "2026-04-22",
+    "title": "Militärstrategie: Wie stellt sich die Bundeswehr zukünftig auf?",
+    "source": "Tagesschau",
+    "category": "Nachrichten"
+  },
+  "https://www.tagesschau.de/inland/regional/nordrheinwestfalen/castortransport-juelich-ahaus-100.html": {
+    "date": "2026-04-22",
+    "title": "Atommülltransport durch NRW wird von Demonstrationen begleitet",
+    "source": "Tagesschau",
+    "category": "Nachrichten"
+  },
+  "https://www.tagesschau.de/ausland/amerika/trump-iran-waffenruhe-ultimatum-100.html": {
+    "date": "2026-04-22",
+    "title": "US-Präsident Trump setzt auf Gespräche mit Iran - der zögert",
+    "source": "Tagesschau",
+    "category": "Nachrichten"
   }
 }
