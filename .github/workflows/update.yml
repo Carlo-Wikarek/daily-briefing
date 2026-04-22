@@ -1,10 +1,8 @@
 name: Daily Update
 
 on:
-  # Taeglich um 07:00 Uhr unsere Zeit
   schedule:
-    - cron: "45 4 * * *"
-  # Manuell ausloesbar
+    - cron: "45 4 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -13,18 +11,24 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Repository auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
+
+      - name: Debug Python Umgebung
+        run: |
+          python --version
+          python -m pip list
 
       - name: Python einrichten
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.12"
 
       - name: Abhaengigkeiten installieren
-        run: pip install feedparser
+        run: pip install feedparser requests beautifulsoup4
 
       - name: Feeds abrufen und HTML generieren
         run: python fetch_feeds.py
