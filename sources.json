@@ -1,11 +1,5 @@
 [
   {
-    "name": "Tagesschau",
-    "url": "https://www.tagesschau.de/xml/rss2",
-    "category": "Nachrichten",
-    "type": "rss"
-  },
-  {
     "name": "Bundesnetzagentur – Beschlusskammer 6",
     "url": "https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Aktuelles_neu.xml?nn=693926",
     "category": "Regulierung",

@@ -54,6 +54,7 @@ SEEN_FILE = os.path.join(SCRIPT_DIR, "seen.json")
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "index.html")
 
 MAX_SEEN_DAYS = 30
+MAX_DISPLAY_DAYS = 2
 
 SCRAPE_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
@@ -131,6 +132,18 @@ def cleanup_seen(seen_data):
         print(f"Bereinigung: {entfernt} veraltete Eintraege aus seen.json entfernt.")
 
     return bereinigt
+
+
+def _is_within_display_window(datum_str):
+    """Prueft ob ein Artikel-Datum innerhalb des Anzeigezeitraums liegt (MAX_DISPLAY_DAYS)."""
+    if not datum_str:
+        return True
+    try:
+        artikel_datum = datetime.strptime(datum_str, "%Y-%m-%d")
+        schwelle = datetime.now() - timedelta(days=MAX_DISPLAY_DAYS)
+        return artikel_datum >= schwelle
+    except ValueError:
+        return True
 
 
 # ---------------------------------------------------------------------------
@@ -339,6 +352,8 @@ def scrape_bk8(url):
                     titel = f"{titel} – {teaser[:160].rstrip()}"
             titel = _clean_text(titel)
             full_url = urljoin(base_url, href)
+            if "/BK08/" not in full_url and "/BK8" not in full_url:
+                continue
             artikel.append({"title": titel, "link": full_url})
 
     print(f"  {len(artikel)} Artikel extrahiert")
@@ -708,15 +723,19 @@ def process_source(quelle, seen_data, heute_artikel, neue_artikel):
             artikel = extract_article(entry, quelle)
             if artikel is None:
                 continue
-            heute_artikel.append(artikel)
             url = artikel["link"]
-            if url not in seen_data:
+            is_new = url not in seen_data
+            if is_new:
                 neue_artikel.append(artikel)
                 seen_data[url] = seen_entry_from_artikel(artikel)
             else:
                 bestehend = seen_data[url]
                 if isinstance(bestehend, dict) and not bestehend.get("title"):
                     seen_data[url] = seen_entry_from_artikel(artikel)
+            if is_new and not _is_within_display_window(artikel["datum"]):
+                print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
+                continue
+            heute_artikel.append(artikel)
 
     elif queltyp == "scrape":
         entries = fetch_scrape(quelle)
@@ -724,15 +743,19 @@ def process_source(quelle, seen_data, heute_artikel, neue_artikel):
             artikel = extract_scraped_article(entry, quelle)
             if artikel is None:
                 continue
-            heute_artikel.append(artikel)
             url = artikel["link"]
-            if url not in seen_data:
+            is_new = url not in seen_data
+            if is_new:
                 neue_artikel.append(artikel)
                 seen_data[url] = seen_entry_from_artikel(artikel)
             else:
                 bestehend = seen_data[url]
                 if isinstance(bestehend, dict) and not bestehend.get("title"):
                     seen_data[url] = seen_entry_from_artikel(artikel)
+            if is_new and not _is_within_display_window(artikel["datum"]):
+                print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
+                continue
+            heute_artikel.append(artikel)
 
     else:
         print(f"WARNUNG: Unbekannter Quell-Typ '{queltyp}' bei '{name}', wird uebersprungen.")
