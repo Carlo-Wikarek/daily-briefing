@@ -726,14 +726,15 @@ def process_source(quelle, seen_data, heute_artikel, neue_artikel):
             url = artikel["link"]
             is_new = url not in seen_data
             if is_new:
-                neue_artikel.append(artikel)
                 seen_data[url] = seen_entry_from_artikel(artikel)
+                if not _is_within_display_window(artikel["datum"]):
+                    print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
+                    continue
+                neue_artikel.append(artikel)
             else:
                 bestehend = seen_data[url]
                 if isinstance(bestehend, dict) and not bestehend.get("title"):
                     seen_data[url] = seen_entry_from_artikel(artikel)
-            if is_new and not _is_within_display_window(artikel["datum"]):
-                print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
                 continue
             heute_artikel.append(artikel)
 
@@ -746,14 +747,15 @@ def process_source(quelle, seen_data, heute_artikel, neue_artikel):
             url = artikel["link"]
             is_new = url not in seen_data
             if is_new:
-                neue_artikel.append(artikel)
                 seen_data[url] = seen_entry_from_artikel(artikel)
+                if not _is_within_display_window(artikel["datum"]):
+                    print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
+                    continue
+                neue_artikel.append(artikel)
             else:
                 bestehend = seen_data[url]
                 if isinstance(bestehend, dict) and not bestehend.get("title"):
                     seen_data[url] = seen_entry_from_artikel(artikel)
-            if is_new and not _is_within_display_window(artikel["datum"]):
-                print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
                 continue
             heute_artikel.append(artikel)
 
