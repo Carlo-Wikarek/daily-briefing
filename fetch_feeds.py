@@ -146,6 +146,32 @@ def _is_within_display_window(datum_str):
         return True
 
 
+def extract_seen_in_range(seen_data, von_datum, bis_datum):
+    """Extrahiert Eintraege aus seen.json deren Datum im angegebenen Bereich liegt.
+    Gibt Liste von dicts zurueck: {url, date, title, source, category}.
+    """
+    artikel = []
+    for url, eintrag in seen_data.items():
+        if not isinstance(eintrag, dict):
+            continue
+        datum_str = eintrag.get("date", "")
+        if not datum_str:
+            continue
+        try:
+            eintrags_datum = datetime.strptime(datum_str, "%Y-%m-%d").date()
+        except ValueError:
+            continue
+        if von_datum <= eintrags_datum <= bis_datum:
+            artikel.append({
+                "url": url,
+                "date": datum_str,
+                "title": eintrag.get("title", ""),
+                "source": eintrag.get("source", ""),
+                "category": eintrag.get("category", ""),
+            })
+    return artikel
+
+
 # ---------------------------------------------------------------------------
 # RSS-Feed Verarbeitung (wie bisher)
 # ---------------------------------------------------------------------------
@@ -518,9 +544,10 @@ def render_categories(artikel_liste):
     return html
 
 
-def generate_html(heute_artikel):
-    """Generiert die komplette index.html."""
+def generate_html(heute_artikel, letzte7_artikel):
+    """Generiert die komplette index.html mit zwei Bereichen: Heute und Letzte 7 Tage."""
     jetzt = datetime.now().strftime("%d.%m.%Y um %H:%M Uhr")
+    heute_str = datetime.now().strftime("%Y-%m-%d")
 
     if not heute_artikel:
         bereich_heute = """
@@ -531,6 +558,24 @@ def generate_html(heute_artikel):
             </div>"""
     else:
         bereich_heute = render_categories(heute_artikel)
+
+    bereich_letzte7 = ""
+    if letzte7_artikel:
+        letzte7_sortiert = sorted(letzte7_artikel, key=lambda x: x["date"], reverse=True)
+        letzte7_html = ""
+        for a in letzte7_sortiert:
+            titel = escape(a.get("title", "") or "Ohne Titel")
+            letzte7_html += f"""
+                        <li>
+                            <a href="{escape(a['url'])}" target="_blank" rel="noopener noreferrer">{titel}</a>
+                            <span class="recent-date">{escape(a['date'])}</span>
+                        </li>"""
+        bereich_letzte7 = f"""
+        <details class="recent-section">
+            <summary class="recent-summary">Letzte 7 Tage ({len(letzte7_artikel)} Artikel)</summary>
+            <ul class="recent-list">{letzte7_html}
+            </ul>
+        </details>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="de">
@@ -669,6 +714,73 @@ def generate_html(heute_artikel):
             font-size: 0.95rem;
         }}
 
+        .recent-section {{
+            margin-top: 48px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #ffffff;
+        }}
+
+        .recent-summary {{
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            cursor: pointer;
+            list-style: none;
+        }}
+
+        .recent-summary::-webkit-details-marker {{
+            display: none;
+        }}
+
+        .recent-summary::before {{
+            content: "▸ ";
+            color: #86868b;
+        }}
+
+        .recent-section[open] .recent-summary::before {{
+            content: "▾ ";
+        }}
+
+        .recent-list {{
+            list-style: none;
+            padding: 0 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }}
+
+        .recent-list li {{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }}
+
+        .recent-list li:last-child {{
+            border-bottom: none;
+        }}
+
+        .recent-list a {{
+            text-decoration: none;
+            color: #1d1d1f;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }}
+
+        .recent-list a:hover {{
+            color: #0071e3;
+        }}
+
+        .recent-date {{
+            font-size: 0.75rem;
+            color: #86868b;
+            white-space: nowrap;
+        }}
+
         footer {{
             text-align: center;
             padding: 30px 20px;
@@ -688,6 +800,10 @@ def generate_html(heute_artikel):
             .article-card {{
                 padding: 12px 16px;
             }}
+            .recent-list li {{
+                flex-direction: column;
+                gap: 2px;
+            }}
         }}
     </style>
 </head>
@@ -700,6 +816,7 @@ def generate_html(heute_artikel):
 
         <main>
             {bereich_heute}
+            {bereich_letzte7}
         </main>
 
         <footer>
@@ -805,8 +922,15 @@ def main():
     save_json(SEEN_FILE, seen_data)
     print(f"seen.json aktualisiert ({len(seen_data)} Eintraege).")
 
+    # Letzte-7-Tage-Artikel aus seen.json extrahieren
+    heute_date = datetime.now().date()
+    von_datum = heute_date - timedelta(days=7)
+    bis_datum = heute_date - timedelta(days=1)
+    letzte7_artikel = extract_seen_in_range(seen_data, von_datum, bis_datum)
+    print(f"Letzte 7 Tage: {len(letzte7_artikel)} Artikel aus seen.json.")
+
     # index.html generieren
-    html_content = generate_html(heute_artikel)
+    html_content = generate_html(heute_artikel, letzte7_artikel)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(html_content)

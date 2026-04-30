@@ -135,6 +135,73 @@
             font-size: 0.95rem;
         }
 
+        .recent-section {
+            margin-top: 48px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+
+        .recent-summary {
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .recent-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .recent-summary::before {
+            content: "▸ ";
+            color: #86868b;
+        }
+
+        .recent-section[open] .recent-summary::before {
+            content: "▾ ";
+        }
+
+        .recent-list {
+            list-style: none;
+            padding: 0 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recent-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .recent-list li:last-child {
+            border-bottom: none;
+        }
+
+        .recent-list a {
+            text-decoration: none;
+            color: #1d1d1f;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .recent-list a:hover {
+            color: #0071e3;
+        }
+
+        .recent-date {
+            font-size: 0.75rem;
+            color: #86868b;
+            white-space: nowrap;
+        }
+
         footer {
             text-align: center;
             padding: 30px 20px;
@@ -154,6 +221,10 @@
             .article-card {
                 padding: 12px 16px;
             }
+            .recent-list li {
+                flex-direction: column;
+                gap: 2px;
+            }
         }
     </style>
 </head>
@@ -161,16 +232,66 @@
     <div class="container">
         <header>
             <h1>DailyBriefing</h1>
-            <p class="subtitle">Deine taegliche Nachrichtenuebersicht &mdash; zuletzt aktualisiert am 29.04.2026 um 07:08 Uhr</p>
+            <p class="subtitle">Deine taegliche Nachrichtenuebersicht &mdash; zuletzt aktualisiert am 30.04.2026 um 06:46 Uhr</p>
         </header>
 
         <main>
             
-            <div class="empty-state">
-                <div class="empty-icon">&#128240;</div>
-                <h2>Keine neuen Artikel</h2>
-                <p>Es wurden heute keine neuen Artikel gefunden. Schau morgen wieder vorbei!</p>
-            </div>
+            <section class="category">
+                <h2 class="category-title">Politik</h2>
+                <div class="articles">
+                    <a href="https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/04/20260429-bundesregierung-treibt-bedarfsgerechten-und-kosteneffizienten-ausbau-der-uebertragungsnetze-voran.html" class="article-card" target="_blank" rel="noopener noreferrer">
+                        <div class="article-meta">
+                            <span class="article-source">BMWE – Pressemitteilungen</span>
+                            <span class="article-date">2026-04-30</span>
+                        </div>
+                        <h3 class="article-title">Bundesregierung treibt bedarfsgerechten und kosteneffizienten Ausbau der Übertragungsnetze voran</h3>
+                        
+                    </a>
+                </div>
+            </section>
+            
+        <details class="recent-section">
+            <summary class="recent-summary">Letzte 7 Tage (9 Artikel)</summary>
+            <ul class="recent-list">
+                        <li>
+                            <a href="http://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Ausschreibungen/Solaranlagen2/Jun2026/artikel.html" target="_blank" rel="noopener noreferrer">Ausschreibung Solaranlagen zweites Segment: Gebotstermin 1. Juni 2026</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="http://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Ausschreibungen/Solaranlagen2/BeendeteAusschreibungen/2026/Feb2026/artikel.html" target="_blank" rel="noopener noreferrer">Ausschreibung Solaranlagen zweites Segment: Gebotstermin 1. Februar 2026</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.bundesnetzagentur.de/DE/Beschlusskammern/1_GZ/BK8-GZ/2026/2026_3-Steller/BK8-26-004x1_bis_BK8-26-004x5_Einleitung_Konsultation_Festlegungsentwurf.html?nn=801456" target="_blank" rel="noopener noreferrer">Einleitung eines Verfahrens und der Konsultation zur Festlegung – wegen der Anwendbarkeit der Regelung für Kleinstnetzbetreiber nach den Vorgaben der Festlegung eines Regulierungsrahmens und der Methode der Anreizregulierung f</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93889.html" target="_blank" rel="noopener noreferrer">Das Stromnetz von heute und morgen erleben: Amprion beim Dreiklangfest in Hamm</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93888.html" target="_blank" rel="noopener noreferrer">Stromleitung zwischen Göttelborn und Illingen wird ab Mai erneuert</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93697.html" target="_blank" rel="noopener noreferrer">Offshore-Windenergie für NRW: Amprion lädt zu Bürgerinfomärkten ein</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93696.html" target="_blank" rel="noopener noreferrer">Arbeiten an Amprion-Stromleitung: Vollsperrung der A1 am Wittlicher Kreuz</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93636.html" target="_blank" rel="noopener noreferrer">Amprion begibt erfolgreich erstmals grüne Hybridanleihen</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+                        <li>
+                            <a href="https://www.amprion.net/Presse/Presse-Detailseite_93570.html" target="_blank" rel="noopener noreferrer">Rhein-Main-Link: Online-Bürgersprechstunden zu Planfeststellungsunterlagen</a>
+                            <span class="recent-date">2026-04-28</span>
+                        </li>
+            </ul>
+        </details>
         </main>
 
         <footer>
