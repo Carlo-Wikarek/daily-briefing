@@ -1,26 +1,26 @@
 [
   {
     "name": "Bundesnetzagentur – Beschlusskammer 6",
-    "url": "https://www.bundesnetzagentur.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed/RSSNewsfeed_Aktuelles_neu.xml?nn=693926",
-    "category": "Regulierung",
-    "type": "rss"
+    "url": "https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK06/BK6_01_Aktuell/BK6_Aktuelles.html",
+    "category": "Nachrichten",
+    "type": "scrape"
   },
   {
     "name": "Bundesnetzagentur – Beschlusskammer 8",
     "url": "https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK08/BK8_01_Aktuell/BK8_Aktuell.html",
-    "category": "Regulierung",
+    "category": "Nachrichten",
     "type": "scrape"
   },
   {
     "name": "BMWE – Pressemitteilungen",
     "url": "https://www.bundeswirtschaftsministerium.de/SiteGlobals/BMWI/Forms/Listen/Medienraum/Medienraum_Formular.html?resourceId=398b4ab7-5ed0-4cf1-9f97-623f77eb8748&input_=73557d3d-47a4-4aca-b24c-e549aa242865&pageLocale=de&templateQueryStringListen=&to=&from=&documentType_=PressRelease&documentType_.GROUP=1&cl2Categories_LeadKeyword=energie&cl2Categories_LeadKeyword.GROUP=1&selectSort=&selectSort.GROUP=1&selectTimePeriod=&selectTimePeriod.GROUP=1",
-    "category": "Politik",
+    "category": "Nachrichten",
     "type": "scrape"
   },
   {
     "name": "Amprion – Pressemitteilungen",
     "url": "https://www.amprion.net/Presse/Pressemitteilungen/Presse%C3%BCbersicht_aktuell.html?filterListPage=1",
-    "category": "Netzbetrieb",
+    "category": "Nachrichten",
     "type": "scrape"
   }
 ]

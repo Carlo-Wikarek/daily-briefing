@@ -146,6 +146,14 @@ def _is_within_display_window(datum_str):
         return True
 
 
+SOURCE_SHORT = {
+    "Amprion – Pressemitteilungen": "Amprion",
+    "Bundesnetzagentur – Beschlusskammer 8": "BK8",
+    "Bundesnetzagentur – Beschlusskammer 6": "BK6",
+    "BMWE – Pressemitteilungen": "BMWE",
+}
+
+
 def extract_seen_in_range(seen_data, von_datum, bis_datum):
     """Extrahiert Eintraege aus seen.json deren Datum im angegebenen Bereich liegt.
     Gibt Liste von dicts zurueck: {url, date, title, source, category}.
@@ -386,6 +394,49 @@ def scrape_bk8(url):
     return artikel
 
 
+def scrape_bk6(url):
+    """Extrahiert Eintraege von Bundesnetzagentur BK6 Aktuell-Seite.
+    Struktur: Tabelle, erste Zelle hat Titel/Link, zweite Zelle hat Datum.
+    """
+    artikel = []
+    name = "BK6"
+    print(f"Scrape: {name}")
+    resp, soup = _fetch_page(url, name)
+    if not soup:
+        return artikel
+
+    base_url = "https://www.bundesnetzagentur.de/"
+
+    for table in soup.find_all("table"):
+        for row in table.find_all("tr"):
+            cells = row.find_all(["td", "th"])
+            if len(cells) < 2:
+                continue
+            first_cell = cells[0]
+            a = first_cell.find("a", href=True)
+            if not a:
+                continue
+            titel = _clean_text(a.get_text())
+            href = str(a.get("href", ""))
+            if not href:
+                continue
+            if not _filter_title(titel) or not titel:
+                continue
+            cell_text = _clean_text(first_cell.get_text())
+            if cell_text and len(cell_text) > len(titel):
+                teaser = cell_text[len(titel):].strip()
+                if teaser:
+                    titel = f"{titel} – {teaser[:160].rstrip()}"
+            titel = _clean_text(titel)
+            full_url = urljoin(base_url, href)
+            if "/BK06/" not in full_url and "/BK6" not in full_url:
+                continue
+            artikel.append({"title": titel, "link": full_url})
+
+    print(f"  {len(artikel)} Artikel extrahiert")
+    return artikel
+
+
 def scrape_bmwe(url):
     """Extrahiert Pressemitteilungen von bundeswirtschaftsministerium.de.
     Struktur: .card-title hat den Titel, Parent enthaelt den Link.
@@ -427,6 +478,8 @@ def scrape_bmwe(url):
 
 SCRAPE_FUNCTIONS = {
     "amprion": scrape_amprion,
+    "bk8": scrape_bk8,
+    "bk6": scrape_bk6,
     "bundesnetzagentur": scrape_bk8,
     "bundeswirtschaftsministerium": scrape_bmwe,
 }
@@ -565,10 +618,12 @@ def generate_html(heute_artikel, letzte7_artikel):
         letzte7_html = ""
         for a in letzte7_sortiert:
             titel = escape(a.get("title", "") or "Ohne Titel")
+            source_raw = a.get("source", "")
+            source_short = SOURCE_SHORT.get(source_raw, source_raw)
             letzte7_html += f"""
                         <li>
                             <a href="{escape(a['url'])}" target="_blank" rel="noopener noreferrer">{titel}</a>
-                            <span class="recent-date">{escape(a['date'])}</span>
+                            <span class="recent-source">{escape(source_short)}</span>
                         </li>"""
         bereich_letzte7 = f"""
         <details class="recent-section">
@@ -775,7 +830,7 @@ def generate_html(heute_artikel, letzte7_artikel):
             color: #0071e3;
         }}
 
-        .recent-date {{
+        .recent-source {{
             font-size: 0.75rem;
             color: #86868b;
             white-space: nowrap;
