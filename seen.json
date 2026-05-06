@@ -323,12 +323,6 @@
     "source": "Heise Online",
     "category": "Technologie"
   },
-  "https://www.heise.de/news/Artemis-2-erreicht-Einflusssphaere-des-Mondes-11246179.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-06",
-    "title": "Erste Menschen seit 50 Jahren: Artemis-Astronauten am Etappenziel",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
   "https://www.heise.de/news/Fieses-Osterei-D-Trust-verlangt-Zertifikatstausch-bis-Ostermontag-11245930.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
     "date": "2026-04-16",
     "title": "",
@@ -2696,6 +2690,18 @@
   "https://www.amprion.net/Presse/Presse-Detailseite_94144.html": {
     "date": "2026-05-05",
     "title": "Bauarbeiten für Erdkabelverbindung zwischen Voerde und Rheinberg beginnen",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_94272.html": {
+    "date": "2026-05-06",
+    "title": "Straßensperrungen in Koblenz-Kesselheim für Masterhöhungen am 10. und 17. Mai 2026",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_94336.html": {
+    "date": "2026-05-06",
+    "title": "Meilensteinfeier in der Umspannanlage Merzen: Erster Bauabschnitt erfolgreich abgeschlossen",
     "source": "Amprion – Pressemitteilungen",
     "category": "Nachrichten"
   }
