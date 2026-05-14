@@ -95,60 +95,6 @@
     "source": "Heise Online",
     "category": "Technologie"
   },
-  "https://www.heise.de/news/Ubiquiti-UniFi-Play-Codeschmuggel-in-Audiosystem-moeglich-11256890.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Ubiquiti UniFi Play: Codeschmuggel in Audiosystem möglich",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Analyse-zur-Deutschland-App-Digitalminister-Wildberger-geht-ins-Risiko-11256737.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Analyse zur Deutschland-App: Digitalminister Wildberger geht ins Risiko",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Booking-com-Unbefugte-Zugriffe-von-Kriminellen-entdeckt-11256689.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Booking.com: Unbefugte Zugriffe von Kriminellen entdeckt",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/SAP-Patchday-Eine-kritische-SQL-Injection-Luecke-und-18-weitere-11256627.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "SAP-Patchday: Eine kritische SQL-Injection-Lücke – und 18 weitere",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/CPUID-Durch-Schwachstelle-mehrere-Stunden-Malware-verteilt-11256219.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "CPUID: Angreifer haben über Webseite Malware-Installer verteilt",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Angriffe-auf-sieben-Sicherheitsluecken-beobachtet-eine-ist-14-Jahre-alt-11255833.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Angriffe auf sieben Sicherheitslücken beobachtet – eine ist 14 Jahre alt",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Analyse-KI-Modelle-auch-als-Gruppe-weniger-kreativ-als-viele-Menschen-11255791.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Analyse: KI-Modelle auch als Gruppe weniger kreativ als viele Menschen",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Rockstar-Games-Kriminelle-Gang-veroeffentlicht-Daten-11255795.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Rockstar Games: Kriminelle Gang veröffentlicht Daten",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
-  "https://www.heise.de/news/Linux-7-0-erschienen-mehr-als-ein-Nummernsprung-11255745.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
-    "date": "2026-04-14",
-    "title": "Linux 7.0 erschienen – mehr als ein Nummernsprung",
-    "source": "Heise Online",
-    "category": "Technologie"
-  },
   "https://www.heise.de/news/Fieses-Osterei-D-Trust-verlangt-Zertifikatstausch-bis-Ostermontag-11245930.html?wt_mc=rss.red.ho.top-news.atom.beitrag.beitrag": {
     "date": "2026-04-16",
     "title": "",
@@ -2535,6 +2481,24 @@
     "date": "2026-05-11",
     "title": "Beschluss im Festlegungsverfahren zur Fortentwicklung des „Redispatch 2.0“ (BK6-23-241)",
     "source": "Bundesnetzagentur – Beschlusskammer 6",
+    "category": "Nachrichten"
+  },
+  "https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/05/20260513-gemeinsame-pressemitteilung-neue-weichenstellung-fuer-den-gebaeudebereich-bundeskabinett-beschliesst-gebaeudemodernisierungsgesetz.html": {
+    "date": "2026-05-14",
+    "title": "Neue Weichenstellung für den Gebäudebereich - Bundeskabinett beschließt Gebäudemodernisierungsgesetz",
+    "source": "BMWE – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/05/20260513-meilenstein-fuer-die-versorgungssicherheit-strom-kapazitaetsmarkt-sichert-zukuenftig-die-versorgung-mit-strom-ab.html": {
+    "date": "2026-05-14",
+    "title": "Meilenstein für die Versorgungssicherheit Strom: Kapazitätsmarkt sichert zukünftig die Versorgung mit Strom ab",
+    "source": "BMWE – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_94593.html": {
+    "date": "2026-05-14",
+    "title": "Voerde: Straßensperrungen zwischen Löhnen und Mehrum",
+    "source": "Amprion – Pressemitteilungen",
     "category": "Nachrichten"
   }
 }
