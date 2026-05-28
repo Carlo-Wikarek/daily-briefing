@@ -1,58 +1,4 @@
 {
-  "http://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Ausschreibungen/Solaranlagen2/Jun2026/artikel.html": {
-    "date": "2026-04-28",
-    "title": "Ausschreibung Solaranlagen zweites Segment: Gebotstermin 1. Juni 2026",
-    "source": "Bundesnetzagentur – Beschlusskammer 6",
-    "category": "Regulierung"
-  },
-  "http://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/Ausschreibungen/Solaranlagen2/BeendeteAusschreibungen/2026/Feb2026/artikel.html": {
-    "date": "2026-04-28",
-    "title": "Ausschreibung Solaranlagen zweites Segment: Gebotstermin 1. Februar 2026",
-    "source": "Bundesnetzagentur – Beschlusskammer 6",
-    "category": "Regulierung"
-  },
-  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/1_GZ/BK8-GZ/2026/2026_3-Steller/BK8-26-004x1_bis_BK8-26-004x5_Einleitung_Konsultation_Festlegungsentwurf.html?nn=801456": {
-    "date": "2026-04-28",
-    "title": "Einleitung eines Verfahrens und der Konsultation zur Festlegung – wegen der Anwendbarkeit der Regelung für Kleinstnetzbetreiber nach den Vorgaben der Festlegung eines Regulierungsrahmens und der Methode der Anreizregulierung f",
-    "source": "Bundesnetzagentur – Beschlusskammer 8",
-    "category": "Regulierung"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93889.html": {
-    "date": "2026-04-28",
-    "title": "Das Stromnetz von heute und morgen erleben: Amprion beim Dreiklangfest in Hamm",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93888.html": {
-    "date": "2026-04-28",
-    "title": "Stromleitung zwischen Göttelborn und Illingen wird ab Mai erneuert",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93697.html": {
-    "date": "2026-04-28",
-    "title": "Offshore-Windenergie für NRW: Amprion lädt zu Bürgerinfomärkten ein",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93696.html": {
-    "date": "2026-04-28",
-    "title": "Arbeiten an Amprion-Stromleitung: Vollsperrung der A1 am Wittlicher Kreuz",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93636.html": {
-    "date": "2026-04-28",
-    "title": "Amprion begibt erfolgreich erstmals grüne Hybridanleihen",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
-  "https://www.amprion.net/Presse/Presse-Detailseite_93570.html": {
-    "date": "2026-04-28",
-    "title": "Rhein-Main-Link: Online-Bürgersprechstunden zu Planfeststellungsunterlagen",
-    "source": "Amprion – Pressemitteilungen",
-    "category": "Netzbetrieb"
-  },
   "https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/04/20260429-bundesregierung-treibt-bedarfsgerechten-und-kosteneffizienten-ausbau-der-uebertragungsnetze-voran.html": {
     "date": "2026-04-30",
     "title": "Bundesregierung treibt bedarfsgerechten und kosteneffizienten Ausbau der Übertragungsnetze voran",
@@ -1034,6 +980,48 @@
   "https://www.amprion.net/Presse/Presse-Detailseite_94976.html": {
     "date": "2026-05-26",
     "title": "Amprion sichert Schlüsselstandort für den ersten Rhein-Main-Link-Konverter",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/1_GZ/BK8-GZ/2026/2026_3-Steller/BK8-26-004x1_bis_BK8-26-004x5_Einleitung_Konsultation_Festlegungsentwurf.html?nn=801456": {
+    "date": "2026-05-28",
+    "title": "Einleitung eines Verfahrens und der Konsultation zur Festlegung – wegen der Anwendbarkeit der Regelung für Kleinstnetzbetreiber nach den Vorgaben der Festlegung eines Regulierungsrahmens und der Methode der Anreizregulierung f",
+    "source": "Bundesnetzagentur – Beschlusskammer 8",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93889.html": {
+    "date": "2026-05-28",
+    "title": "Das Stromnetz von heute und morgen erleben: Amprion beim Dreiklangfest in Hamm",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93888.html": {
+    "date": "2026-05-28",
+    "title": "Stromleitung zwischen Göttelborn und Illingen wird ab Mai erneuert",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93697.html": {
+    "date": "2026-05-28",
+    "title": "Offshore-Windenergie für NRW: Amprion lädt zu Bürgerinfomärkten ein",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93696.html": {
+    "date": "2026-05-28",
+    "title": "Arbeiten an Amprion-Stromleitung: Vollsperrung der A1 am Wittlicher Kreuz",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93636.html": {
+    "date": "2026-05-28",
+    "title": "Amprion begibt erfolgreich erstmals grüne Hybridanleihen",
+    "source": "Amprion – Pressemitteilungen",
+    "category": "Nachrichten"
+  },
+  "https://www.amprion.net/Presse/Presse-Detailseite_93570.html": {
+    "date": "2026-05-28",
+    "title": "Rhein-Main-Link: Online-Bürgersprechstunden zu Planfeststellungsunterlagen",
     "source": "Amprion – Pressemitteilungen",
     "category": "Nachrichten"
   }
