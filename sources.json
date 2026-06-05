@@ -28,14 +28,11 @@
     "url": "https://www.netztransparenz.de/de-de/%C3%9Cber-uns/Aktuelles",
     "category": "Nachrichten",
     "type": "scrape"
-  }
-  ,
+  },
   {
-    "_comment": "TenneT RSS deaktiviert: Feed-XML ist fehlerhaft (not well-formed). Bei Gelegenheit erneut pruefen.",
     "name": "TenneT – News",
-    "url": "https://www.tennet.eu/de/feeds/news/rss.xml",
+    "url": "https://www.tennet.eu/de/news-de",
     "category": "Nachrichten",
-    "type": "rss",
-    "disabled": true
+    "type": "scrape"
   }
 ]
