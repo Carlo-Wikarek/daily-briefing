@@ -53,7 +53,7 @@ SOURCES_FILE = os.path.join(SCRIPT_DIR, "sources.json")
 SEEN_FILE = os.path.join(SCRIPT_DIR, "seen.json")
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "index.html")
 
-MAX_SEEN_DAYS = 30
+MAX_SEEN_DAYS = 365
 MAX_DISPLAY_DAYS = 2
 
 SCRAPE_HEADERS = {
@@ -307,6 +307,38 @@ def _fetch_page(url, name, use_raw_bytes=False):
         return None, None
 
 
+def extract_date_generic(element):
+    """Generische Datumsextraktion als Fallback fuer neue/ unbekannte Quellen.
+    Versucht (in Reihenfolge):
+      1. <time datetime="YYYY-MM-DD">
+      2. DD.MM.YYYY im Text
+      3. YYYY-MM-DD im Text
+    Gibt das Datum als String "YYYY-MM-DD" zurueck oder "".
+    """
+    if not element:
+        return ""
+    time_tag = element.find("time")
+    if time_tag and time_tag.get("datetime"):
+        try:
+            return datetime.strptime(time_tag["datetime"][:10], "%Y-%m-%d").strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            pass
+    text = element.get_text()
+    match = re.search(r'\d{2}\.\d{2}\.\d{4}', text)
+    if match:
+        try:
+            return datetime.strptime(match.group(), "%d.%m.%Y").strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            pass
+    match = re.search(r'\d{4}-\d{2}-\d{2}', text)
+    if match:
+        try:
+            return datetime.strptime(match.group(), "%Y-%m-%d").strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            pass
+    return ""
+
+
 def scrape_amprion(url):
     """Extrahiert Pressemitteilungen von amprion.net.
     Struktur: h3.mol--press-release__headline hat den Titel,
@@ -332,7 +364,15 @@ def scrape_amprion(url):
             continue
         href = str(a.get("href", ""))
         full_url = urljoin(url, href)
-        artikel.append({"title": titel, "link": full_url})
+        published = ""
+        date_div = parent.find("div", class_="mol--press-release__date") if parent else None
+        if date_div:
+            time_el = date_div.find("time")
+            if time_el and time_el.get("datetime"):
+                published = time_el["datetime"]
+        if not published and parent:
+            published = extract_date_generic(parent)
+        artikel.append({"title": titel, "link": full_url, "published": published})
 
     # Duplikate entfernen
     seen = set()
@@ -388,7 +428,15 @@ def scrape_bk8(url):
             full_url = urljoin(base_url, href)
             if "/BK08/" not in full_url and "/BK8" not in full_url:
                 continue
-            artikel.append({"title": titel, "link": full_url})
+            published = ""
+            datum_text = _clean_text(cells[0].get_text())
+            try:
+                published = datetime.strptime(datum_text, "%d.%m.%Y").strftime("%Y-%m-%d")
+            except (ValueError, TypeError):
+                pass
+            if not published:
+                published = extract_date_generic(row)
+            artikel.append({"title": titel, "link": full_url, "published": published})
 
     print(f"  {len(artikel)} Artikel extrahiert")
     return artikel
@@ -470,7 +518,20 @@ def scrape_bmwe(url):
         # "Pressemitteilung:" Praefix entfernen
         if titel.lower().startswith("pressemitteilung:"):
             titel = titel[len("pressemitteilung:"):].strip()
-        artikel.append({"title": titel, "link": href})
+        published = ""
+        parent = card_title.parent
+        if parent:
+            match = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", parent.get_text())
+            if match:
+                try:
+                    published = datetime.strptime(
+                        f"{match.group(1)}.{match.group(2)}.{match.group(3)}", "%d.%m.%Y"
+                    ).strftime("%Y-%m-%d")
+                except ValueError:
+                    pass
+        if not published:
+            published = extract_date_generic(card_title.parent)
+        artikel.append({"title": titel, "link": href, "published": published})
 
     print(f"  {len(artikel)} Artikel extrahiert")
     return artikel
@@ -506,7 +567,8 @@ def fetch_scrape(quelle):
         return []
 
     print(f"Scrape Seite: {name} ({url})")
-    return funktion(url)
+    artikel = funktion(url)
+    return artikel[:10]
 
 
 def extract_scraped_article(scraped_entry, quelle):
@@ -528,6 +590,7 @@ def extract_scraped_article(scraped_entry, quelle):
         "kategorie": quelle.get("category", "Allgemein"),
         "quelle": quelle.get("name", "Unbekannt"),
         "zusammenfassung": "",
+        "published": scraped_entry.get("published", ""),
     }
 
 
@@ -537,12 +600,15 @@ def extract_scraped_article(scraped_entry, quelle):
 
 def seen_entry_from_artikel(artikel):
     """Erstellt einen seen.json-Eintrag aus einem Artikel-Objekt."""
-    return {
+    entry = {
         "date": artikel["datum"],
         "title": artikel["titel"],
         "source": artikel["quelle"],
         "category": artikel["kategorie"],
     }
+    if artikel.get("published"):
+        entry["published"] = artikel["published"]
+    return entry
 
 
 def render_article_cards(artikel_liste):
@@ -556,11 +622,12 @@ def render_article_cards(artikel_liste):
             if len(a["zusammenfassung"]) > 150:
                 zusammenfassung_kurz += "..."
 
+        anzeige_datum = a.get("published") or a["datum"]
         html += f"""
                     <a href="{escape(a['link'])}" class="article-card" target="_blank" rel="noopener noreferrer">
                         <div class="article-meta">
                             <span class="article-source">{escape(a['quelle'])}</span>
-                            <span class="article-date">{escape(a['datum'])}</span>
+                            <span class="article-date">{escape(anzeige_datum)}</span>
                         </div>
                         <h3 class="article-title">{escape(a['titel'])}</h3>
                         {f'<p class="article-summary">{zusammenfassung_kurz}</p>' if zusammenfassung_kurz else ''}
@@ -620,9 +687,11 @@ def generate_html(heute_artikel, letzte7_artikel):
             titel = escape(a.get("title", "") or "Ohne Titel")
             source_raw = a.get("source", "")
             source_short = SOURCE_SHORT.get(source_raw, source_raw)
+            datum = a.get("published") or a.get("date", "")
+            datum_str = f' <span class="recent-date">{escape(datum)}</span>' if datum else ""
             letzte7_html += f"""
                         <li>
-                            <a href="{escape(a['url'])}" target="_blank" rel="noopener noreferrer">{titel}</a>
+                            <a href="{escape(a['url'])}" target="_blank" rel="noopener noreferrer">{titel}{datum_str}</a>
                             <span class="recent-source">{escape(source_short)}</span>
                         </li>"""
         bereich_letzte7 = f"""
@@ -834,6 +903,12 @@ def generate_html(heute_artikel, letzte7_artikel):
             font-size: 0.75rem;
             color: #86868b;
             white-space: nowrap;
+        }}
+
+        .recent-date {{
+            font-size: 0.7rem;
+            color: #86868b;
+            margin-left: 4px;
         }}
 
         footer {{
