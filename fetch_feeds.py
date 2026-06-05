@@ -151,6 +151,8 @@ SOURCE_SHORT = {
     "Bundesnetzagentur – Beschlusskammer 8": "BK8",
     "Bundesnetzagentur – Beschlusskammer 6": "BK6",
     "BMWE – Pressemitteilungen": "BMWE",
+    "TenneT – News": "TenneT",
+    "Netztransparenz – Aktuelles": "Netztransparenz",
 }
 
 
@@ -537,12 +539,61 @@ def scrape_bmwe(url):
     return artikel
 
 
+def scrape_netztransparenz(url):
+    """Extrahiert Artikel von netztransparenz.de Aktuelles-Seite.
+    Nutzt generische Extraktion: Links mit Titeln und extract_date_generic fuer Datum.
+    Bei 403/503 wird klar geloggt und die Quelle uebersprungen.
+    """
+    artikel = []
+    name = "Netztransparenz"
+    print(f"Scrape: {name}")
+    try:
+        resp = requests.get(url, headers=SCRAPE_HEADERS, timeout=20)
+        print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
+        if resp.status_code in (403, 503):
+            print(f"  FEHLER: Server blockiert Anfrage (HTTP {resp.status_code}) fuer '{name}'. Quelle wird uebersprungen.")
+            return artikel
+        if resp.status_code != 200:
+            print(f"  FEHLER: Unerwarteter HTTP {resp.status_code} fuer '{name}'. Quelle wird uebersprungen.")
+            return artikel
+        soup = BeautifulSoup(resp.text, "html.parser")
+    except Exception as e:
+        print(f"  FEHLER beim Laden von '{name}': {e}. Quelle wird uebersprungen.")
+        return artikel
+
+    for a in soup.find_all("a", href=True):
+        href = str(a.get("href", ""))
+        if not href or href.startswith("#") or "javascript:" in href.lower():
+            continue
+        titel = _clean_text(a.get_text())
+        if not _filter_title(titel) or len(titel) < 15:
+            continue
+        full_url = urljoin(url, href)
+        if full_url == url:
+            continue
+        parent = a.parent
+        published = extract_date_generic(parent) if parent else ""
+        artikel.append({"title": titel, "link": full_url, "published": published})
+
+    seen = set()
+    unique = []
+    for a in artikel:
+        if a["link"] not in seen:
+            seen.add(a["link"])
+            unique.append(a)
+    artikel = unique[:10]
+
+    print(f"  {len(artikel)} Artikel extrahiert")
+    return artikel
+
+
 SCRAPE_FUNCTIONS = {
     "amprion": scrape_amprion,
     "bk8": scrape_bk8,
     "bk6": scrape_bk6,
     "bundesnetzagentur": scrape_bk8,
     "bundeswirtschaftsministerium": scrape_bmwe,
+    "netztransparenz": scrape_netztransparenz,
 }
 
 
@@ -1037,6 +1088,9 @@ def main():
     neue_artikel = []
 
     for quelle in quellen:
+        if quelle.get("disabled"):
+            print(f"UEBERSPRUNGEN: Quelle '{quelle.get('name', '?')}' ist deaktiviert.")
+            continue
         try:
             process_source(quelle, seen_data, heute_artikel, neue_artikel)
         except Exception as e:

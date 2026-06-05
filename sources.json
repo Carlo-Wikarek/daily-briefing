@@ -22,5 +22,20 @@
     "url": "https://www.amprion.net/Presse/Pressemitteilungen/Presse%C3%BCbersicht_aktuell.html?filterListPage=1",
     "category": "Nachrichten",
     "type": "scrape"
+  },
+  {
+    "name": "Netztransparenz – Aktuelles",
+    "url": "https://www.netztransparenz.de/de-de/%C3%9Cber-uns/Aktuelles",
+    "category": "Nachrichten",
+    "type": "scrape"
+  }
+  ,
+  {
+    "_comment": "TenneT RSS deaktiviert: Feed-XML ist fehlerhaft (not well-formed). Bei Gelegenheit erneut pruefen.",
+    "name": "TenneT – News",
+    "url": "https://www.tennet.eu/de/feeds/news/rss.xml",
+    "category": "Nachrichten",
+    "type": "rss",
+    "disabled": true
   }
 ]
