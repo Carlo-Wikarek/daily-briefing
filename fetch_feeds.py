@@ -589,8 +589,10 @@ def scrape_tennet(url):
 
 def scrape_netztransparenz(url):
     """Extrahiert Artikel von netztransparenz.de Aktuelles-Seite.
-    Nutzt generische Extraktion: Links mit Titeln und extract_date_generic fuer Datum.
-    Bei 403/503 wird klar geloggt und die Quelle uebersprungen.
+    Hinweis: Die Seite ist eine SPA (Vue.js) - Artikel werden per JS/API geladen.
+    Die API erfordert Authentifizierung, daher koennen keine Artikel extrahiert werden.
+    Versucht den SPA-Shell zu erkennen und loggt einen klaren Hinweis.
+    Filtert Navigationslinks (kein Datum, kurze Titel, falsche URL-Muster) heraus.
     """
     artikel = []
     name = "Netztransparenz"
@@ -609,18 +611,38 @@ def scrape_netztransparenz(url):
         print(f"  FEHLER beim Laden von '{name}': {e}. Quelle wird uebersprungen.")
         return artikel
 
+    spa_detected = bool(soup.find("div", id=re.compile(r"xsp-app-\d+")) or soup.find("div", class_="xsp_teaserlist"))
+    if spa_detected:
+        print(f"  HINWEIS: Seite ist eine SPA (Artikel werden per JavaScript geladen, API erfordert Auth).")
+        print(f"  CSS-Selektoren gefunden: div[id^='xsp-app-'], div.xsp_teaserlist")
+        print(f"  Keine Artikel koennen aus dem statischen HTML extrahiert werden.")
+        return artikel
+
+    raw_links = 0
+    filtered_no_date = 0
+    filtered_short_title = 0
+    filtered_wrong_url = 0
+
     for a in soup.find_all("a", href=True):
         href = str(a.get("href", ""))
         if not href or href.startswith("#") or "javascript:" in href.lower():
             continue
         titel = _clean_text(a.get_text())
-        if not _filter_title(titel) or len(titel) < 15:
+        if not _filter_title(titel) or len(titel) < 20:
+            filtered_short_title += 1
             continue
         full_url = urljoin(url, href)
         if full_url == url:
             continue
+        if not re.search(r'(?:aktuelles|news|detail|\/\d{4}[-\/]|\/\d{2}[-\/])', full_url, re.IGNORECASE):
+            filtered_wrong_url += 1
+            continue
         parent = a.parent
         published = extract_date_generic(parent) if parent else ""
+        if not published:
+            filtered_no_date += 1
+            continue
+        raw_links += 1
         artikel.append({"title": titel, "link": full_url, "published": published})
 
     seen = set()
@@ -631,6 +653,7 @@ def scrape_netztransparenz(url):
             unique.append(a)
     artikel = unique[:10]
 
+    print(f"  Gefiltert: {filtered_short_title} (Titel < 20 Zeichen), {filtered_no_date} (kein Datum), {filtered_wrong_url} (falsche URL)")
     print(f"  {len(artikel)} Artikel extrahiert")
     return artikel
 

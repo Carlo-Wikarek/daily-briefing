@@ -25,7 +25,7 @@
   },
   {
     "name": "Netztransparenz – Aktuelles",
-    "url": "https://www.netztransparenz.de/de-de/%C3%9Cber-uns/Aktuelles",
+    "url": "https://www.netztransparenz.de/de-de/Über-uns/Aktuelles/",
     "category": "Nachrichten",
     "type": "scrape"
   },
