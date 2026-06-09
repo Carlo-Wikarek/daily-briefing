@@ -27,12 +27,12 @@
     "name": "Netztransparenz – Aktuelles",
     "url": "https://www.netztransparenz.de/de-de/Über-uns/Aktuelles/",
     "category": "Nachrichten",
-    "type": "scrape"
+    "type": "api"
   },
   {
     "name": "TenneT – News",
-    "url": "https://www.tennet.eu/de/news-de",
+    "url": "https://www.tennet.eu/de/feeds/news/rss.xml",
     "category": "Nachrichten",
-    "type": "scrape"
+    "type": "rss"
   }
 ]

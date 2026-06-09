@@ -187,7 +187,10 @@ def extract_seen_in_range(seen_data, von_datum, bis_datum):
 # ---------------------------------------------------------------------------
 
 def fetch_feed(quelle):
-    """Ruft einen RSS-Feed ab und gibt die Entries zurueck."""
+    """Ruft einen RSS-Feed ab und gibt die Entries zurueck.
+    Falls feedparser den direkten Abruf nicht parsen kann, wird der Feed
+    zuerst mit requests heruntergeladen und dann an feedparser uebergeben.
+    """
     name = quelle.get("name", "Unbekannt")
     url = quelle.get("url", "")
 
@@ -198,6 +201,20 @@ def fetch_feed(quelle):
     try:
         print(f"Rufe RSS-Feed ab: {name} ({url})")
         feed = feedparser.parse(url)
+
+        if feed.bozo and not feed.entries:
+            print(f"  Direkter feedparser.parse() fehlgeschlagen: {feed.bozo_exception}")
+            print(f"  Versuche alternativ: requests.get() + feedparser.parse(content)")
+            try:
+                resp = requests.get(url, headers=SCRAPE_HEADERS, timeout=20)
+                print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
+                if resp.status_code != 200:
+                    print(f"  FEHLER: HTTP {resp.status_code} fuer '{name}'")
+                    return []
+                feed = feedparser.parse(resp.content)
+            except Exception as e2:
+                print(f"  FEHLER: Alternativer Abruf fehlgeschlagen: {e2}")
+                return []
 
         if feed.bozo and not feed.entries:
             print(f"FEHLER: Feed '{name}' konnte nicht geparst werden: {feed.bozo_exception}")
@@ -587,73 +604,101 @@ def scrape_tennet(url):
     return artikel
 
 
-def scrape_netztransparenz(url):
-    """Extrahiert Artikel von netztransparenz.de Aktuelles-Seite.
-    Hinweis: Die Seite ist eine SPA (Vue.js) - Artikel werden per JS/API geladen.
-    Die API erfordert Authentifizierung, daher koennen keine Artikel extrahiert werden.
-    Versucht den SPA-Shell zu erkennen und loggt einen klaren Hinweis.
-    Filtert Navigationslinks (kein Datum, kurze Titel, falsche URL-Muster) heraus.
+def fetch_netztransparenz_api(quelle):
+    """Ruft die Netztransparenz-News-API ab und gibt Artikel zurueck.
+
+    Die Seite ist eine SPA - Artikel werden per JSON-API geladen.
+    Workflow:
+      1. Login via auth/Login (anonymous, erfordert loginDto aus der Seite)
+      2. POST newsItems/Get mit Filter-Payload
+      3. Extrahiere Titel, Link, Datum aus der JSON-Antwort
     """
     artikel = []
     name = "Netztransparenz"
-    print(f"Scrape: {name}")
+    base_url = quelle.get("url", "https://www.netztransparenz.de/de-de/Über-uns/Aktuelles/")
+    hub_api = "https://www.netztransparenz.de/xspproxy/api/"
+    login_dto = {
+        "encryptedData": "paoIp2xm7WJ/9+z8/GVC4K4z9zoV6KORUBjFcVA6OgD3gninLAV7IBjtfXUWjK7V3EcEB+ivjOlqclOLGMcLTp+h4i8YWBZIxNGLgu8m7nb7thmyhvjRbcscFFQnx69ErS2CUK3phZv/NuRDEjfSUuoogyEkYxRP2bpKsZRXLkC8RNzFN9bck9MhyaW7yEOWkl4LiL3KMKkvrvfLb1znVFCQswd2cvWkPBZLix4PykE=",
+        "iv": "NU9mYasHXthKNGXBTHOYDQ==",
+    }
+    client_id = "776e7a05-4990-4141-8bcb-df621dafc98d"
+
+    print(f"API-Abruf: {name}")
+
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": SCRAPE_HEADERS["User-Agent"],
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json",
+    })
+
     try:
-        resp = requests.get(url, headers=SCRAPE_HEADERS, timeout=20)
-        print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
-        if resp.status_code in (403, 503):
-            print(f"  FEHLER: Server blockiert Anfrage (HTTP {resp.status_code}) fuer '{name}'. Quelle wird uebersprungen.")
+        lr = session.post(hub_api + "auth/Login", json=login_dto, timeout=20)
+        print(f"  Login: HTTP {lr.status_code}")
+        if lr.status_code != 200:
+            print(f"  FEHLER: Login fehlgeschlagen (HTTP {lr.status_code}). Quelle wird uebersprungen.")
             return artikel
-        if resp.status_code != 200:
-            print(f"  FEHLER: Unerwarteter HTTP {resp.status_code} fuer '{name}'. Quelle wird uebersprungen.")
+        login_data = lr.json()
+        if not login_data.get("data", {}).get("success"):
+            print(f"  FEHLER: Login nicht erfolgreich. Quelle wird uebersprungen.")
             return artikel
-        soup = BeautifulSoup(resp.text, "html.parser")
     except Exception as e:
-        print(f"  FEHLER beim Laden von '{name}': {e}. Quelle wird uebersprungen.")
+        print(f"  FEHLER: Login-Anfrage fehlgeschlagen: {e}. Quelle wird uebersprungen.")
         return artikel
 
-    spa_detected = bool(soup.find("div", id=re.compile(r"xsp-app-\d+")) or soup.find("div", class_="xsp_teaserlist"))
-    if spa_detected:
-        print(f"  HINWEIS: Seite ist eine SPA (Artikel werden per JavaScript geladen, API erfordert Auth).")
-        print(f"  CSS-Selektoren gefunden: div[id^='xsp-app-'], div.xsp_teaserlist")
-        print(f"  Keine Artikel koennen aus dem statischen HTML extrahiert werden.")
+    payload = {
+        "contains": "",
+        "page": 1,
+        "pageSize": 10,
+        "descending": True,
+        "type": 0,
+        "clientId": client_id,
+        "includeDefaultCategory": True,
+        "languageTag": "de-DE",
+        "showPublished": True,
+        "showUnpublished": False,
+    }
+
+    try:
+        r = session.post(hub_api + "newsItems/Get", json=payload, timeout=20)
+        print(f"  newsItems/Get: HTTP {r.status_code}")
+        if r.status_code != 200:
+            print(f"  FEHLER: API-Fehler (HTTP {r.status_code}): {r.text[:300]}. Quelle wird uebersprungen.")
+            return artikel
+        data = r.json()
+    except Exception as e:
+        print(f"  FEHLER: API-Anfrage fehlgeschlagen: {e}. Quelle wird uebersprungen.")
         return artikel
 
-    raw_links = 0
-    filtered_no_date = 0
-    filtered_short_title = 0
-    filtered_wrong_url = 0
+    items = data.get("data", {}).get("items", [])
+    if not items:
+        print(f"  0 Artikel von API erhalten.")
+        return artikel
 
-    for a in soup.find_all("a", href=True):
-        href = str(a.get("href", ""))
-        if not href or href.startswith("#") or "javascript:" in href.lower():
+    for item in items[:10]:
+        title = ""
+        slug = ""
+        for content_entry in item.get("newsContentList", []):
+            if content_entry.get("language") == "de-DE" or content_entry.get("baseLanguage"):
+                title = content_entry.get("title", "")
+                slug = content_entry.get("slugTitle", "")
+                break
+        if not title:
             continue
-        titel = _clean_text(a.get_text())
-        if not _filter_title(titel) or len(titel) < 20:
-            filtered_short_title += 1
-            continue
-        full_url = urljoin(url, href)
-        if full_url == url:
-            continue
-        if not re.search(r'(?:aktuelles|news|detail|\/\d{4}[-\/]|\/\d{2}[-\/])', full_url, re.IGNORECASE):
-            filtered_wrong_url += 1
-            continue
-        parent = a.parent
-        published = extract_date_generic(parent) if parent else ""
-        if not published:
-            filtered_no_date += 1
-            continue
-        raw_links += 1
-        artikel.append({"title": titel, "link": full_url, "published": published})
 
-    seen = set()
-    unique = []
-    for a in artikel:
-        if a["link"] not in seen:
-            seen.add(a["link"])
-            unique.append(a)
-    artikel = unique[:10]
+        article_id = item.get("id", "")
+        detail_url = f"{base_url}Details/{article_id}/{slug}" if slug else f"{base_url}Details/{article_id}"
 
-    print(f"  Gefiltert: {filtered_short_title} (Titel < 20 Zeichen), {filtered_no_date} (kein Datum), {filtered_wrong_url} (falsche URL)")
+        date_str = ""
+        publish_date = item.get("publishStartDate") or item.get("dateCreated")
+        if publish_date:
+            try:
+                date_str = datetime.fromisoformat(publish_date.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+            except (ValueError, TypeError):
+                pass
+
+        artikel.append({"title": title, "link": detail_url, "published": date_str})
+
     print(f"  {len(artikel)} Artikel extrahiert")
     return artikel
 
@@ -664,7 +709,7 @@ SCRAPE_FUNCTIONS = {
     "bk6": scrape_bk6,
     "bundesnetzagentur": scrape_bk8,
     "bundeswirtschaftsministerium": scrape_bmwe,
-    "netztransparenz": scrape_netztransparenz,
+    "netztransparenz": None,
     "tennet": scrape_tennet,
 }
 
@@ -1129,6 +1174,27 @@ def process_source(quelle, seen_data, heute_artikel, neue_artikel):
                 continue
             heute_artikel.append(artikel)
 
+    elif queltyp == "api":
+        entries = fetch_netztransparenz_api(quelle)
+        for entry in entries:
+            artikel = extract_scraped_article(entry, quelle)
+            if artikel is None:
+                continue
+            url = artikel["link"]
+            is_new = url not in seen_data
+            if is_new:
+                seen_data[url] = seen_entry_from_artikel(artikel)
+                if not _is_within_display_window(artikel["datum"]):
+                    print(f"  Uebersprungen (aelter als {MAX_DISPLAY_DAYS} Tage): {artikel['titel'][:70]}")
+                    continue
+                neue_artikel.append(artikel)
+            else:
+                bestehend = seen_data[url]
+                if isinstance(bestehend, dict) and not bestehend.get("title"):
+                    seen_data[url] = seen_entry_from_artikel(artikel)
+                continue
+            heute_artikel.append(artikel)
+
     else:
         print(f"WARNUNG: Unbekannter Quell-Typ '{queltyp}' bei '{name}', wird uebersprungen.")
 
@@ -1148,7 +1214,8 @@ def main():
 
     rss_count = sum(1 for q in quellen if q.get("type", "rss") == "rss")
     scrape_count = sum(1 for q in quellen if q.get("type") == "scrape")
-    print(f"{len(quellen)} Quellen geladen ({rss_count} RSS, {scrape_count} Scrape).\n")
+    api_count = sum(1 for q in quellen if q.get("type") == "api")
+    print(f"{len(quellen)} Quellen geladen ({rss_count} RSS, {scrape_count} Scrape, {api_count} API).\n")
 
     # Bisher gesehene Artikel laden, migrieren und bereinigen
     seen_data = load_json(SEEN_FILE, {})
