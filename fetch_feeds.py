@@ -187,10 +187,7 @@ def extract_seen_in_range(seen_data, von_datum, bis_datum):
 # ---------------------------------------------------------------------------
 
 def fetch_feed(quelle):
-    """Ruft einen RSS-Feed ab und gibt die Entries zurueck.
-    Falls feedparser den direkten Abruf nicht parsen kann, wird der Feed
-    zuerst mit requests heruntergeladen und dann an feedparser uebergeben.
-    """
+    """Ruft einen RSS-Feed ab und gibt die Entries zurueck."""
     name = quelle.get("name", "Unbekannt")
     url = quelle.get("url", "")
 
@@ -201,20 +198,6 @@ def fetch_feed(quelle):
     try:
         print(f"Rufe RSS-Feed ab: {name} ({url})")
         feed = feedparser.parse(url)
-
-        if feed.bozo and not feed.entries:
-            print(f"  Direkter feedparser.parse() fehlgeschlagen: {feed.bozo_exception}")
-            print(f"  Versuche alternativ: requests.get() + feedparser.parse(content)")
-            try:
-                resp = requests.get(url, headers=SCRAPE_HEADERS, timeout=20)
-                print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
-                if resp.status_code != 200:
-                    print(f"  FEHLER: HTTP {resp.status_code} fuer '{name}'")
-                    return []
-                feed = feedparser.parse(resp.content)
-            except Exception as e2:
-                print(f"  FEHLER: Alternativer Abruf fehlgeschlagen: {e2}")
-                return []
 
         if feed.bozo and not feed.entries:
             print(f"FEHLER: Feed '{name}' konnte nicht geparst werden: {feed.bozo_exception}")
