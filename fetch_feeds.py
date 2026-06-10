@@ -222,6 +222,9 @@ def extract_article(entry, quelle):
     if not link:
         return None
 
+    if "rss.app" in link or quelle.get("name") == "TenneT – News":
+        titel = _clean_tennet_title(titel)
+
     datum_raw = entry.get("published_parsed") or entry.get("updated_parsed")
     if datum_raw:
         try:
@@ -286,6 +289,17 @@ def _clean_text(text):
         return ""
     text = re.sub(r'\s+', ' ', text).strip()
     return text
+
+
+def _clean_tennet_title(titel):
+    """Bereinigt TenneT-Titel vom rss.app Feed.
+    Entfernt Datum-Prafix, Lesezeit-Angaben und ueberfluessige Pipes.
+    """
+    titel = re.sub(r'^\d{1,2}\.\s+\w+\s+\d{4}[\s|]*', '', titel)
+    titel = re.sub(r'Lesezeit\s+\d+\s+Min\w*', '', titel)
+    titel = titel.replace('|', '').strip()
+    titel = re.sub(r'\s+', ' ', titel)
+    return titel
 
 
 def _fetch_page(url, name, use_raw_bytes=False):
