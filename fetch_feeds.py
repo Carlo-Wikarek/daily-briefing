@@ -48,6 +48,13 @@ except ImportError:
     print("Bitte ausfuehren: pip install beautifulsoup4")
     sys.exit(1)
 
+try:
+    from playwright.sync_api import sync_playwright
+    HAS_PLAYWRIGHT = True
+except ImportError:
+    HAS_PLAYWRIGHT = False
+    print("WARNUNG: 'playwright' nicht installiert. BMWE-Scraper wird nicht funktionieren.")
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SOURCES_FILE = os.path.join(SCRIPT_DIR, "sources.json")
 SEEN_FILE = os.path.join(SCRIPT_DIR, "seen.json")
@@ -516,33 +523,34 @@ def scrape_bk6(url):
 
 
 def scrape_bmwe(url):
-    """Extrahiert Pressemitteilungen von bundeswirtschaftsministerium.de.
+    """Extrahiert Pressemitteilungen von bundeswirtschaftsministerium.de
+    via Playwright (headless Chromium), um Bot-Schutz zu umgehen.
     Struktur: li.media-space-list-item > p.card-topline > span.date,
               p.card-title > strong.card-title-label, a.card-link-overlay.
-    Nutzt FULL_BROWSER_HEADERS gegen Bot-Schutz.
     """
     artikel = []
     name = "BMWE"
-    print(f"Scrape: {name}")
+    print(f"Scrape: {name} (Playwright)")
+
+    if not HAS_PLAYWRIGHT:
+        print(f"  FEHLER: playwright nicht installiert. Quelle wird uebersprungen.")
+        return artikel
+
     try:
-        resp = requests.get(url, headers=FULL_BROWSER_HEADERS, timeout=20)
-        print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
-        print(f"  Response-Preview: {resp.text[:500]}")
-        if resp.status_code != 200:
-            print(f"  FEHLER: HTTP {resp.status_code} fuer '{name}'. Quelle wird uebersprungen.")
-            return artikel
-        soup = BeautifulSoup(resp.text, "html.parser")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+            page.wait_for_selector("li.media-space-list-item", timeout=20000)
+
+            html = page.content()
+            browser.close()
     except Exception as e:
-        print(f"  FEHLER beim Laden von '{name}': {e}. Quelle wird uebersprungen.")
+        print(f"  FEHLER: Playwright fehlgeschlagen: {e}. Quelle wird uebersprungen.")
         return artikel
 
-    if not soup.find_all("li"):
-        if any(kw in resp.text.lower()[:2000] for kw in ("cloudflare", "captcha", "verifying", "radware", "bot protection")):
-            print(f"  FEHLER: Bot-Schutz (Cloudflare/Radware) erkannt. Quelle wird uebersprungen.")
-        else:
-            print(f"  FEHLER: Seite enthaelt keine Artikel-Elemente. Moeglicherweise Bot-Schutz aktiv.")
-        return artikel
-
+    soup = BeautifulSoup(html, "html.parser")
     base_url = "https://www.bundeswirtschaftsministerium.de"
 
     for item in soup.select("li.media-space-list-item"):

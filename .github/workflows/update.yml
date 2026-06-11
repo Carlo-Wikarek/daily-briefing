@@ -28,7 +28,9 @@ jobs:
           python-version: "3.12"
 
       - name: Abhaengigkeiten installieren
-        run: pip install feedparser requests beautifulsoup4
+        run: |
+          pip install feedparser requests beautifulsoup4 playwright
+          playwright install chromium --with-deps
 
       - name: Feeds abrufen und HTML generieren
         run: python fetch_feeds.py
