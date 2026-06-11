@@ -503,7 +503,10 @@ def scrape_bk6(url):
 
 def scrape_bmwe(url):
     """Extrahiert Pressemitteilungen von bundeswirtschaftsministerium.de.
-    Struktur: .card-title hat den Titel, Parent enthaelt den Link.
+    Struktur: li.media-space-list-item > p.card-topline > span.date,
+              p.card-title > strong.card-title-label, a.card-link-overlay.
+    Hinweis: Die Seite nutzt Cloudflare/Radware Bot-Schutz. Falls nur eine
+    Challenge-Page zurueckkommt (0 li-Tags), wird dies klar geloggt.
     """
     artikel = []
     name = "BMWE"
@@ -512,45 +515,41 @@ def scrape_bmwe(url):
     if not soup:
         return artikel
 
-    for card_title in soup.select(".card-title"):
-        titel = _clean_text(card_title.get_text())
-        # Link im Parent suchen
-        a = None
-        el = card_title
-        for _ in range(5):
-            el = el.parent
-            if not el:
-                break
-            a = el.find("a", href=True)
-            if a:
-                break
-        if not a:
+    if not soup.find_all("li"):
+        if any(kw in resp.text.lower()[:2000] for kw in ("cloudflare", "captcha", "verifying", "radware", "bot protection")):
+            print(f"  FEHLER: Seite ist durch Bot-Schutz (Cloudflare/Radware) blockiert. Keine Artikel extrahierbar.")
+        else:
+            print(f"  FEHLER: Seite enthaelt keine Artikel-Elemente. Moeglicherweise Bot-Schutz aktiv.")
+        return artikel
+
+    base_url = "https://www.bundeswirtschaftsministerium.de"
+
+    for item in soup.select("li.media-space-list-item"):
+        titel_tag = item.select_one("strong.card-title-label")
+        link_tag = item.select_one("a.card-link-overlay")
+        datum_tag = item.select_one("span.date")
+
+        if not titel_tag or not link_tag:
             continue
-        href = str(a.get("href", ""))
-        if not _filter_title(titel) or not href:
-            if not titel:
-                print(f"  WARNUNG: Leerer Titel fuer Link {href[:60]}")
-            continue
-        # "Pressemitteilung:" Praefix entfernen
-        if titel.lower().startswith("pressemitteilung:"):
-            titel = titel[len("pressemitteilung:"):].strip()
+
+        titel = titel_tag.get_text(strip=True)
+        link = link_tag.get("href", "")
+        datum_text = datum_tag.get_text(strip=True) if datum_tag else ""
+
+        if link.startswith("/"):
+            link = base_url + link
+
         published = ""
-        parent = card_title.parent
-        if parent:
-            match = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", parent.get_text())
-            if match:
-                try:
-                    published = datetime.strptime(
-                        f"{match.group(1)}.{match.group(2)}.{match.group(3)}", "%d.%m.%Y"
-                    ).strftime("%Y-%m-%d")
-                except ValueError:
-                    pass
-        if not published:
-            published = extract_date_generic(card_title.parent)
-        artikel.append({"title": titel, "link": href, "published": published})
+        if datum_text:
+            try:
+                published = datetime.strptime(datum_text, "%d.%m.%Y").strftime("%Y-%m-%d")
+            except ValueError:
+                pass
+
+        artikel.append({"title": titel, "link": link, "published": published})
 
     print(f"  {len(artikel)} Artikel extrahiert")
-    return artikel
+    return artikel[:10]
 
 
 def scrape_tennet(url):
