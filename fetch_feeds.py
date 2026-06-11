@@ -62,6 +62,20 @@ SCRAPE_HEADERS = {
     "Accept-Language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
+FULL_BROWSER_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Cache-Control": "max-age=0",
+}
+
 
 def load_json(filepath, fallback):
     """Laedt eine JSON-Datei oder gibt fallback zurueck bei Fehler."""
@@ -505,19 +519,26 @@ def scrape_bmwe(url):
     """Extrahiert Pressemitteilungen von bundeswirtschaftsministerium.de.
     Struktur: li.media-space-list-item > p.card-topline > span.date,
               p.card-title > strong.card-title-label, a.card-link-overlay.
-    Hinweis: Die Seite nutzt Cloudflare/Radware Bot-Schutz. Falls nur eine
-    Challenge-Page zurueckkommt (0 li-Tags), wird dies klar geloggt.
+    Nutzt FULL_BROWSER_HEADERS gegen Bot-Schutz.
     """
     artikel = []
     name = "BMWE"
     print(f"Scrape: {name}")
-    resp, soup = _fetch_page(url, name)
-    if not soup:
+    try:
+        resp = requests.get(url, headers=FULL_BROWSER_HEADERS, timeout=20)
+        print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
+        print(f"  Response-Preview: {resp.text[:500]}")
+        if resp.status_code != 200:
+            print(f"  FEHLER: HTTP {resp.status_code} fuer '{name}'. Quelle wird uebersprungen.")
+            return artikel
+        soup = BeautifulSoup(resp.text, "html.parser")
+    except Exception as e:
+        print(f"  FEHLER beim Laden von '{name}': {e}. Quelle wird uebersprungen.")
         return artikel
 
     if not soup.find_all("li"):
         if any(kw in resp.text.lower()[:2000] for kw in ("cloudflare", "captcha", "verifying", "radware", "bot protection")):
-            print(f"  FEHLER: Seite ist durch Bot-Schutz (Cloudflare/Radware) blockiert. Keine Artikel extrahierbar.")
+            print(f"  FEHLER: Bot-Schutz (Cloudflare/Radware) erkannt. Quelle wird uebersprungen.")
         else:
             print(f"  FEHLER: Seite enthaelt keine Artikel-Elemente. Moeglicherweise Bot-Schutz aktiv.")
         return artikel
@@ -555,14 +576,15 @@ def scrape_bmwe(url):
 def scrape_tennet(url):
     """Extrahiert News-Artikel von tennet.eu/de/news-de.
     Nutzt generische Extraktion mit extract_date_generic fuer Datum.
-    Bei 403 wird klar geloggt und die Quelle uebersprungen.
+    Nutzt FULL_BROWSER_HEADERS gegen Bot-Schutz.
     """
     artikel = []
     name = "TenneT"
     print(f"Scrape: {name}")
     try:
-        resp = requests.get(url, headers=SCRAPE_HEADERS, timeout=20)
+        resp = requests.get(url, headers=FULL_BROWSER_HEADERS, timeout=20)
         print(f"  HTTP {resp.status_code}, {len(resp.content)} Bytes empfangen")
+        print(f"  Response-Preview: {resp.text[:500]}")
         if resp.status_code in (403, 503):
             print(f"  FEHLER: Server blockiert Anfrage (HTTP {resp.status_code}) fuer '{name}'. Quelle wird uebersprungen.")
             return artikel
