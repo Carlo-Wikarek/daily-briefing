@@ -13,9 +13,9 @@
   },
   {
     "name": "BMWE – Pressemitteilungen",
-    "url": "https://www.bundeswirtschaftsministerium.de/Navigation/DE/Service/Medienraum/medienraum.html",
+    "url": "https://www.bundeswirtschaftsministerium.de/SiteGlobals/BMWI/Functions/RSSFeed/DE/RSSFeed-Energie.xml",
     "category": "Nachrichten",
-    "type": "scrape"
+    "type": "rss"
   },
   {
     "name": "Amprion – Pressemitteilungen",
