@@ -1947,5 +1947,19 @@
     "source": "Netztransparenz – Aktuelles",
     "category": "Nachrichten",
     "published": "2026-09-22"
+  },
+  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK08/BK8_02_FormErhB/Downloads/EHB_Regulierungskonto_2025_UENB_V_1.1.html?nn=801456": {
+    "date": "2026-09-25",
+    "title": "Erhebungsbogen Regulierungskonto ÜNB 2025",
+    "source": "Bundesnetzagentur – Beschlusskammer 8",
+    "category": "Nachrichten",
+    "published": "2026-09-22"
+  },
+  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/BK08/BK8_02_FormErhB/Downloads/EHB_Regulierungskonto_2025_VNB_V_1.1.html?nn=801456": {
+    "date": "2026-09-25",
+    "title": "Erhebungsbogen Regulierungskonto VNB 2025",
+    "source": "Bundesnetzagentur – Beschlusskammer 8",
+    "category": "Nachrichten",
+    "published": "2026-09-22"
   }
 }
