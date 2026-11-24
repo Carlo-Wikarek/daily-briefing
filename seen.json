@@ -2283,5 +2283,31 @@
     "source": "Amprion – Pressemitteilungen",
     "category": "Nachrichten",
     "published": "2026-11-20"
+  },
+  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/1_GZ/BK6-GZ/2026/BK6-26-639/BK6-26-639_verfahrenseroeffnung.html?nn=660086": {
+    "date": "2026-11-24",
+    "title": "Festlegungsverfahren zur Änderung des flächenspezifischen Höchstwertes nach §§ 19, 53 WindSeeG-E (BK6-26-639)",
+    "source": "Bundesnetzagentur – Beschlusskammer 6",
+    "category": "Nachrichten"
+  },
+  "https://www.bundesnetzagentur.de/DE/Beschlusskammern/1_GZ/BK6-GZ/2025/BK6-25-534/BK6-25-534_beschluss.html?nn=660086": {
+    "date": "2026-11-24",
+    "title": "Entscheidung im Besonderen Missbrauchsverfahren der MIRAI Power GmbH nach § 31 EnWG wegen der Ablehnung eines Netzanschlussbegehrens für eine Batteriespeicheranlage ( Az. BK6-25-534)",
+    "source": "Bundesnetzagentur – Beschlusskammer 6",
+    "category": "Nachrichten"
+  },
+  "https://www.netztransparenz.de/de-de/Über-uns/Aktuelles/Details/18519/einladung-marktgestuetzte-beschaffung-von-momentanreserve-stakeholder-workshop": {
+    "date": "2026-11-24",
+    "title": "Einladung: Marktgestützte Beschaffung von Momentanreserve – Stakeholder-Workshop",
+    "source": "Netztransparenz – Aktuelles",
+    "category": "Nachrichten",
+    "published": "2026-11-23"
+  },
+  "https://www.netztransparenz.de/de-de/Über-uns/Aktuelles/Details/18527/wartungsarbeiten-bei-50hertz": {
+    "date": "2026-11-24",
+    "title": "Wartungsarbeiten bei 50Hertz",
+    "source": "Netztransparenz – Aktuelles",
+    "category": "Nachrichten",
+    "published": "2026-11-23"
   }
 }
